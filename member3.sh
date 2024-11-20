@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 
 # Color variables
 RED='\033[0;31m'
