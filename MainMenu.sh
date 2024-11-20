@@ -367,5 +367,137 @@ echo "cp $filename $backup_file
     echo "The latest backup was made in $datetime" > latestBackup.txt
 }
 #---------------------------------------------------
-## Place to print stuff
+# Member 3: Ishilia
+#---------------------------------------------------
+
+# Color Variables
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+RESET='\033[0m'
+
+#  << User Management Section>>
+
+# 1. Add a user with a specified username and password
+add_user() {
+    echo -e "${CYAN}Enter username to add:${RESET}"
+    read username
+    echo -e "${CYAN}Enter password for $username:${RESET}"
+    read -s password
+    sudo useradd -m "$username" && echo "$username:$password" | sudo chpasswd
+    echo -e "${GREEN}User $username has been added.${RESET}"
+}
+
+# 2. Grant root permission to a user
+grant_root_permission() {
+    echo -e "${CYAN}Enter the username to grant root permissions:${RESET}"
+    read username
+    sudo usermod -aG sudo "$username"
+    echo -e "${GREEN}$username has been granted root permissions.${RESET}"
+}
+
+# 3. Delete a user
+delete_user() {
+    echo -e "${CYAN}Enter the username to delete:${RESET}"
+    read username
+    sudo userdel -r "$username"
+    echo -e "${GREEN}User $username has been deleted.${RESET}"
+}
+
+# 4. Display connected users and disconnect a selected remote user
+display_connected_users() {
+    echo -e "${CYAN}Currently connected users:${RESET}"
+    who
+}
+
+disconnect_user() {
+    echo -e "${CYAN}Enter the username of the user to disconnect:${RESET}"
+    read username
+    sudo pkill -KILL -u "$username"
+    echo -e "${GREEN}User $username has been disconnected.${RESET}"
+}
+
+# 5. List groups a user is a member of and change a user’s group
+list_user_groups() {
+    echo -e "${CYAN}Enter the username to list groups:${RESET}"
+    read username
+    groups "$username"
+}
+
+change_user_group() {
+    echo -e "${CYAN}Enter the username to change group:${RESET}"
+    read username
+    echo -e "${CYAN}Enter the new group for $username:${RESET}"
+    read group
+    sudo usermod -g "$group" "$username"
+    echo -e "${GREEN}User $username's group has been changed to $group.${RESET}"
+}
+
+userManagementMenu() {
+    export COLUMNS=1
+    select userOption in "$(color_Text 216 'Add a user')" \
+                         "$(color_Text 216 'Grant root permissions')" \
+                         "$(color_Text 216 'Delete a user')" \
+                         "$(color_Text 216 'Display connected users')" \
+                         "$(color_Text 216 'Disconnect users')" \
+                         "$(color_Text 216 'List users')" \
+                         "$(color_Text 216 'Change user groups')" \
+                         "$(color_Text 216 'Back')"; do
+          case $userOption in
+          "$(color_Text 216 'Add User')")
+              add_user
+              ;;
+          "$(color_Text 216 'Grant root permissions')"
+	      grant_root_permission
+              ;;
+          "$(color_Text 216 'Remove User')"
+              delete_user
+}
+
+# << File Management Section >>
+
+# 1. Search for a file in a specified user’s home directory and display its path
+search_file() {
+    echo -e "${CYAN}Enter the username to search their home directory:${RESET}"
+    read username
+    echo -e "${CYAN}Enter the file name to search:${RESET}"
+    read filename
+    find /home/"$username" -name "$filename" 2>/dev/null
+
+# 2. Display the 10 largest files in a user’s home directory
+largest_files() {
+    echo -e "${CYAN}Enter the username to list largest files:${RESET}"
+    read username
+    find /home/"$username" -type f -exec du -h {} + | sort -rh | head -n 10
+}
+
+# 3. Display the 10 oldest files in a user’s home directory
+oldest_files() {
+    echo -e "${CYAN}Enter the username to list oldest files:${RESET}"
+    read username
+    find /home/"$username" -type f -exec ls -lt {} + | tail -n 10
+}
+
+# 4. Email a file as an attachment based on user-provided email and file name
+email_file() {
+    echo -e "${CYAN}Enter the email address to send the file to:${RESET}"
+    read email
+    echo -e "${CYAN}Enter the username whose file you want to send:${RESET}"
+    read username
+    echo -e "${CYAN}Enter the file name to send:${RESET}"
+    read filename
+    echo -e "${CYAN}Enter the subject of the email:${RESET}"
+    read subject
+    echo -e "${CYAN}Enter the body of the email:${RESET}"
+    read body
+
+    # Send the email using mail command (ensure mailutils is installed)
+    echo "$body" | mail -s "$subject" -A /home/"$username"/"$filename" "$email"
+    echo -e "${GREEN}File $filename has been sent to $email.${RESET}"
+}
+
+
+## place to print stuff (start the script)
 mainMenu
