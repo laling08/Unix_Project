@@ -134,7 +134,7 @@ mainMenu(){
 select taskOf in "$(color_Text 216 'User Management')" "$(color_Text 200 'Process Management')" "$(color_Text 155 'Service Management')" "$(color_Text 166 'Backup')" "$(color_Text 52 'Network Management')" "$(color_Text 27 'File Management')" "$(color_Text 8 'Exit')"
 do
         case $taskOf in "$(color_Text 216 'User Management')")
-        echo "User Management"
+        userManagementMenu
         ;;
         "$(color_Text 200 'Process Management')")
         sys_Sta_Menu
@@ -149,7 +149,7 @@ do
         netManMenu
         ;;
         "$(color_Text 27 'File Management')")
-        echo "File Management"
+        fileManagementMenu
         ;;
         "$(color_Text 8 'Exit')")
         echo "You Are Exiting Now..."
@@ -422,8 +422,7 @@ disconnect_user() {
 # 5. List groups a user is a member of and change a user’s group
 list_user_groups() {
     echo -e "${CYAN}Enter the username to list groups:${RESET}"
-    read username
-    groups "$username"
+    reaups "$username"
 }
 
 change_user_group() {
@@ -435,26 +434,39 @@ change_user_group() {
     echo -e "${GREEN}User $username's group has been changed to $group.${RESET}"
 }
 
+# User Management Menu Function
 userManagementMenu() {
     export COLUMNS=1
-    select userOption in "$(color_Text 216 'Add a user')" \
-                         "$(color_Text 216 'Grant root permissions')" \
-                         "$(color_Text 216 'Delete a user')" \
-                         "$(color_Text 216 'Display connected users')" \
-                         "$(color_Text 216 'Disconnect users')" \
-                         "$(color_Text 216 'List users')" \
-                         "$(color_Text 216 'Change user groups')" \
-                         "$(color_Text 216 'Back')"; do
-          case $userOption in
-          "$(color_Text 216 'Add User')")
-              add_user
-              ;;
-          "$(color_Text 216 'Grant root permissions')"
-	      grant_root_permission
-              ;;
-          "$(color_Text 216 'Remove User')"
-              delete_user
+    PS3="$(echo -e "${CYAN}Please select a user management option: ${RESET}")"
+
+    options=("Add a user"
+             "Grant root permissions"
+             "Delete a user"
+             "Display connected users"
+             "Disconnect users"
+             "List user groups"
+             "Change user groups"
+             "Back to Main Menu"
+             "Exit")
+
+    select choice in "${options[@]}"; do
+        case $REPLY in
+        1) echo -e "${GREEN}Add a user selected.${RESET}" && add_user ;;
+        2) echo -e "${YELLOW}Grant root permissions selected.${RESET}" && grant_root_permission ;;
+        3) echo -e "${RED}Delete a user selected.${RESET}" && delete_user ;;
+        4) echo -e "${CYAN}Display connected users selected.${RESET}" && display_connected_users ;;
+        5) echo -e "${BLUE}Disconnect users selected.${RESET}" && disconnect_user ;;
+        6) echo -e "${GREEN}List user groups selected.${RESET}" && list_user_groups ;;
+        7) echo -e "${YELLOW}Change user groups selected.${RESET}" && change_user_group ;;
+        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu ;;
+        9) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
+        *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
+        esac
+    done
 }
+
+
+
 
 # << File Management Section >>
 
@@ -465,6 +477,7 @@ search_file() {
     echo -e "${CYAN}Enter the file name to search:${RESET}"
     read filename
     find /home/"$username" -name "$filename" 2>/dev/null
+}
 
 # 2. Display the 10 largest files in a user’s home directory
 largest_files() {
@@ -498,6 +511,30 @@ email_file() {
     echo -e "${GREEN}File $filename has been sent to $email.${RESET}"
 }
 
+# File Management Menu
+fileManagementMenu() {
+    export COLUMNS=1
+    PS3="$(echo -e "${CYAN}Please select a file management option: ${RESET}")" # Properly format PS3 prompt
+
+    options=("Search for a file"
+             "Display the 10 largest files"
+             "Display the 10 oldest files"
+             "Email a file as an attachment"
+             "Back to Main Menu"
+             "Exit")
+
+    select choice in "${options[@]}"; do
+        case $REPLY in
+        1) echo -e "${GREEN}Search for a file selected.${RESET}" && search_file ;;
+        2) echo -e "${YELLOW}Display the 10 largest files selected.${RESET}" && largest_files ;;
+        3) echo -e "${BLUE}Display the 10 oldest files selected.${RESET}" && oldest_files ;;
+        4) echo -e "${RED}Email a file as an attachment selected.${RESET}" && email_file ;;
+        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu ;;
+        6) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
+        *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
+        esac
+    done
+}
 
 ## place to print stuff (start the script)
 mainMenu
