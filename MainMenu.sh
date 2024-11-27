@@ -594,83 +594,162 @@ RESET='\033[0m'
 
 # 1. Add a user with a specified username and password
 add_user() {
-    echo -e "${CYAN}Enter username to add:${RESET}"
+    echo -e "${CYAN}Enter the username for the new user:${RESET}"
     read username
-    echo -e "${CYAN}Enter password for $username:${RESET}"
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    echo -e "${CYAN}Enter the password for the new user:${RESET}"
     read -s password
-    sudo useradd -m "$username" && echo "$username:$password" | sudo chpasswd
-    echo -e "${GREEN}User $username has been added.${RESET}"
+    if [ -z "$password" ]; then
+        echo -e "${RED}Password cannot be empty.${RESET}"
+        return 1
+    fi
+
+    sudo useradd -m -p $(openssl passwd -1 "$password") "$username" && \
+    echo -e "${GREEN}User $username added successfully.${RESET}" || \
+    echo -e "${RED}Failed to add user $username.${RESET}"
 }
 
-# 2. Grant root permission to a user
-grant_root_permission() {
-    echo -e "${CYAN}Enter the username to grant root permissions:${RESET}"
+# 2. Give Root Permissions to a User
+give_root_permission() {
+    echo -e "${CYAN}Enter the username to give root permissions:${RESET}"
     read username
-    sudo usermod -aG sudo "$username"
-    echo -e "${GREEN}$username has been granted root permissions.${RESET}"
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
+    sudo usermod -aG sudo "$username" && \
+    echo -e "${GREEN}User $username is now a sudoer.${RESET}" || \
+    echo -e "${RED}Failed to grant sudo permissions to $username.${RESET}"
 }
 
-# 3. Delete a user
+# 3. Delete a User
 delete_user() {
     echo -e "${CYAN}Enter the username to delete:${RESET}"
     read username
-    sudo userdel -r "$username"
-    echo -e "${GREEN}User $username has been deleted.${RESET}"
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
+    sudo userdel -r "$username" && \
+    echo -e "${GREEN}User $username deleted successfully.${RESET}" || \
+    echo -e "${RED}Failed to delete user $username.${RESET}"
 }
 
-# 4. Display connected users and disconnect a selected remote user
-display_connected_users() {
+# 4. Show a  List of Currently Connected Users
+show_connected_users() {
     echo -e "${CYAN}Currently connected users:${RESET}"
-    who
+    who || echo -e "${RED}Failed to list connected users.${RESET}"
 }
 
+# 5. Disconnect a Specific Remote User
 disconnect_user() {
-    echo -e "${CYAN}Enter the username of the user to disconnect:${RESET}"
+    echo -e "${CYAN}Enter the username to disconnect:${RESET}"
     read username
-    sudo pkill -KILL -u "$username"
-    echo -e "${GREEN}User $username has been disconnected.${RESET}"
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! who | grep -q "$username"; then
+        echo -e "${RED}User $username is not connected.${RESET}"
+        return 1
+    fi
+
+    sudo pkill -KILL -u "$username" && \
+    echo -e "${GREEN}User $username disconnected successfully.${RESET}" || \
+    echo -e "${RED}Failed to disconnect user $username.${RESET}"
 }
 
-# 5. List groups a user is a member of and change a user’s group
-list_user_groups() {
-    echo -e "${CYAN}Enter the username to list groups:${RESET}"
-    read "$username"
+# 6. Show the List of All Groups That a User Is a Member Of
+show_user_groups() {
+    echo -e "${CYAN}Enter the username to show groups for:${RESET}"
+    read username
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
+    groups "$username" || echo -e "${RED}Failed to show groups for $username.${RESET}"
 }
 
+# 7. Change the User Group
 change_user_group() {
-    echo -e "${CYAN}Enter the username to change group:${RESET}"
+    echo -e "${CYAN}Enter the username to change the group for:${RESET}"
     read username
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
     echo -e "${CYAN}Enter the new group for $username:${RESET}"
     read group
-    sudo usermod -g "$group" "$username"
-    echo -e "${GREEN}User $username's group has been changed to $group.${RESET}"
+    if [ -z "$group" ]; then
+        echo -e "${RED}Group name cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! getent group "$group" &>/dev/null; then
+        echo -e "${RED}Group $group does not exist.${RESET}"
+        return 1
+    fi
+
+    sudo usermod -g "$group" "$username" && \
+    echo -e "${GREEN}User $username group changed to $group.${RESET}" || \
+    echo -e "${RED}Failed to change user $username group.${RESET}"
 }
+
 
 # User Management Menu Function
 userManagementMenu() {
     export COLUMNS=1
     PS3="$(echo -e "${CYAN}Please select a user management option: ${RESET}")"
 
-    options=("Add a user"
-             "Grant root permissions"
-             "Delete a user"
-             "Display connected users"
-             "Disconnect users"
-             "List user groups"
-             "Change user groups"
+    options=("Add a new user"
+             "Give root permissions to a user"
+             "Delete an existing user"
+             "Show a list of currently connected users"
+             "Disconnect a specific remote user"
+             "Show user groups"
+             "Change user group"
              "Back to Main Menu"
              "Exit")
 
     select choice in "${options[@]}"; do
         case $REPLY in
-        1) echo -e "${GREEN}Add a user selected.${RESET}" && add_user ;;
-        2) echo -e "${YELLOW}Grant root permissions selected.${RESET}" && grant_root_permission ;;
-        3) echo -e "${RED}Delete a user selected.${RESET}" && delete_user ;;
-        4) echo -e "${CYAN}Display connected users selected.${RESET}" && display_connected_users ;;
-        5) echo -e "${BLUE}Disconnect users selected.${RESET}" && disconnect_user ;;
-        6) echo -e "${GREEN}List user groups selected.${RESET}" && list_user_groups ;;
-        7) echo -e "${YELLOW}Change user groups selected.${RESET}" && change_user_group ;;
-        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu ;;
+        1) add_user ;;
+        2) give_root_permission ;;
+        3) delete_user ;;
+        4) show_connected_users ;;
+        5) disconnect_user ;;
+        6) show_user_groups ;;
+        7) change_user_group ;;
+        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
         9) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
         *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
         esac
@@ -678,70 +757,140 @@ userManagementMenu() {
 }
 
 
-
-
 # << File Management Section >>
 
-# 1. Search for a file in a specified user’s home directory and display its path
-search_file() {
-    echo -e "${CYAN}Enter the username to search their home directory:${RESET}"
+# 1. Search for a File in the User's Home Directory
+search_file_in_home() {
+    echo -e "${CYAN}Enter the username to search for a file:${RESET}"
     read username
-    echo -e "${CYAN}Enter the file name to search:${RESET}"
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
+    echo -e "${CYAN}Enter the file name to search for:${RESET}"
     read filename
-    find /home/"$username" -name "$filename" 2>/dev/null
+    if [ -z "$filename" ]; then
+        echo -e "${RED}File name cannot be empty.${RESET}"
+        return 1
+    fi
+
+    user_home=$(eval echo ~$username)
+    file_path=$(find "$user_home" -type f -name "$filename" 2>/dev/null)
+
+    if [ -z "$file_path" ]; then
+        echo -e "${RED}File $filename not found in $user_home.${RESET}"
+    else
+        echo -e "${GREEN}File found: $file_path${RESET}"
+    fi
 }
 
-# 2. Display the 10 largest files in a user’s home directory
-largest_files() {
-    echo -e "${CYAN}Enter the username to list largest files:${RESET}"
+# 2. Display the 10 Largest Files in the User's Home Directory
+display_largest_files() {
+    echo -e "${CYAN}Enter the username to display the largest files:${RESET}"
     read username
-    find /home/"$username" -type f -exec du -h {} + | sort -rh | head -n 10
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
+    user_home=$(eval echo ~$username)
+
+    echo -e "${CYAN}Displaying the 10 largest files in $user_home:${RESET}"
+    find "$user_home" -type f -exec du -h {} + | sort -rh | head -n 10 || echo -e "${RED}Failed to list largest files.${RESET}"
 }
 
-# 3. Display the 10 oldest files in a user’s home directory
-oldest_files() {
-    echo -e "${CYAN}Enter the username to list oldest files:${RESET}"
+# 3. Display the 10 oldesr Files in the User's Home Directory
+display_oldest_files() {
+    echo -e "${CYAN}Enter the username to display the oldest files:${RESET}"
     read username
-    find /home/"$username" -type f -exec ls -lt {} + | tail -n 10
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
+    user_home=$(eval echo ~$username)
+
+    echo -e "${CYAN}Displaying the 10 oldest files in $user_home:${RESET}"
+    find "$user_home" -type f -exec stat --format '%Y %n' {} + | sort -n | head -n 10 | cut -d' ' -f2- || echo -e "${RED}Failed to list oldest files.${RESET}"
 }
 
-# 4. Email a file as an attachment based on user-provided email and file name
-email_file() {
+# 4. Send a file as an Email Attachment
+send_file_email_attachment() {
     echo -e "${CYAN}Enter the email address to send the file to:${RESET}"
     read email
-    echo -e "${CYAN}Enter the username whose file you want to send:${RESET}"
-    read username
-    echo -e "${CYAN}Enter the file name to send:${RESET}"
-    read filename
-    echo -e "${CYAN}Enter the subject of the email:${RESET}"
-    read subject
-    echo -e "${CYAN}Enter the body of the email:${RESET}"
-    read body
+    if [ -z "$email" ]; then
+        echo -e "${RED}Email address cannot be empty.${RESET}"
+        return 1
+    fi
 
-    # Send the email using mail command (ensure mailutils is installed)
-    echo "$body" | mail -s "$subject" -A /home/"$username"/"$filename" "$email"
-    echo -e "${GREEN}File $filename has been sent to $email.${RESET}"
+    echo -e "${CYAN}Enter the file name to attach:${RESET}"
+    read filename
+    if [ -z "$filename" ]; then
+        echo -e "${RED}File name cannot be empty.${RESET}"
+        return 1
+    fi
+
+    echo -e "${CYAN}Enter the username whose home directory the file is located in:${RESET}"
+    read username
+    if [ -z "$username" ]; then
+        echo -e "${RED}Username cannot be empty.${RESET}"
+        return 1
+    fi
+
+    if ! id "$username" &>/dev/null; then
+        echo -e "${RED}User $username does not exist.${RESET}"
+        return 1
+    fi
+
+    user_home=$(eval echo ~$username)
+    file_path=$(find "$user_home" -type f -name "$filename" 2>/dev/null)
+
+    if [ -z "$file_path" ]; then
+        echo -e "${RED}File $filename not found in $user_home.${RESET}"
+        return 1
+    fi
+
+    echo -e "${CYAN}Sending email with file $filename as an attachment to $email...${RESET}"
+    echo "Please find the attached file." | mail -s "File Attachment: $filename" -a "$file_path" "$email" && \
+    echo -e "${GREEN}Email sent successfully to $email.${RESET}" || \
+    echo -e "${RED}Failed to send email.${RESET}"
 }
 
-# File Management Menu
+# File Management Menu Function
 fileManagementMenu() {
     export COLUMNS=1
-    PS3="$(echo -e "${CYAN}Please select a file management option: ${RESET}")" # Properly format PS3 prompt
+    PS3="$(echo -e "${CYAN}Please select a file management option: ${RESET}")"
 
-    options=("Search for a file"
-             "Display the 10 largest files"
-             "Display the 10 oldest files"
-             "Email a file as an attachment"
+    options=("Search for a file in user's home directory"
+             "Display the 10 largest files in user's home directory"
+             "Display the 10 oldest files in user's home directory"
+             "Send a file as an email attachment"
              "Back to Main Menu"
              "Exit")
 
     select choice in "${options[@]}"; do
         case $REPLY in
-        1) echo -e "${GREEN}Search for a file selected.${RESET}" && search_file ;;
-        2) echo -e "${YELLOW}Display the 10 largest files selected.${RESET}" && largest_files ;;
-        3) echo -e "${BLUE}Display the 10 oldest files selected.${RESET}" && oldest_files ;;
-        4) echo -e "${RED}Email a file as an attachment selected.${RESET}" && email_file ;;
-        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu ;;
+        1) search_file_in_home ;;
+        2) display_largest_files ;;
+        3) display_oldest_files ;;
+        4) send_file_email_attachment ;;
+        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
         6) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
         *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
         esac
