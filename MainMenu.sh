@@ -587,7 +587,7 @@ crontab crontab.txt
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
+BLUE='\033[38;5;27m'
 CYAN='\033[0;36m'
 PEACH='\033[38;5;216m'
 RESET='\033[0m'
@@ -732,15 +732,19 @@ userManagementMenu() {
     export COLUMNS=1
     PS3="$(echo -e "${CYAN}Please select a user management option: ${RESET}")"
 
-    options=("Add a new user"
-             "Give root permissions to a user"
-             "Delete an existing user"
-             "Show a list of currently connected users"
-             "Disconnect a specific remote user"
-             "Show user groups"
-             "Change user group$"
-             "Back to Main Menu$"
-             "Exit")
+    options=(
+
+            "$(echo -e "${PEACH}Add a new user${RESET}")"
+            "$(echo -e "${PEACH}Give root permissions to a user${RESET}")"
+            "$(echo -e "${PEACH}Delete an existing user${RESET}")"
+            "$(echo -e "${PEACH}Show a list of currently connected users${RESET}")"
+            "$(echo -e "${PEACH}Disconnect a specific remote user${RESET}")"
+            "$(echo -e "${PEACH}Show user groups${RESET}")"
+            "$(echo -e "${PEACH}Change user group${RESET}")"
+            "$(echo -e "${PEACH}Back to Main Menu${RESET}")"
+            "$(echo -e "${PEACH}Exit${RESET}")"
+    )
+
 
     select choice in "${options[@]}"; do
         case $REPLY in
@@ -879,12 +883,14 @@ fileManagementMenu() {
     export COLUMNS=1
     PS3="$(echo -e "${CYAN}Please select a file management option: ${RESET}")"
 
-    options=("Search for a file in user's home directory"
-             "Display the 10 largest files in user's home directory"
-             "Display the 10 oldest files in user's home directory"
-             "Send a file as an email attachment"
-             "Back to Main Menu"
-             "Exit")
+    options=(
+	     "$(echo -e "${BLUE}Search for a file in user's home directory${RESET}")"
+             "$(echo -e "${BLUE}Display the 10 largest files in user's home directory${RESET}")"
+             "$(echo -e "${BLUE}Display the 10 oldest files in user's home directory${RESET}")"
+             "$(echo -e "${BLUE}Send a file as an email attachment${RESET}")"
+             "$(echo -e "${BLUE}Back to Main Menu${RESET}")"
+             "$(echo -e "${BLUE}Exit${RESET}")"
+    )
 
     select choice in "${options[@]}"; do
         case $REPLY in
