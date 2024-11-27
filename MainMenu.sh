@@ -1,10 +1,18 @@
 #!/bin/bash
 #-----------------------------------------------------
 ## Section Main Menu
-echo -e "\e[38;5;160mIshilia-Jonathan-Nicholas\e[0m"
-echo -e "   \e[48;5;0;38;5;196m Main Menu\e[0m"
+
+# Color Variables
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[38;5;27m'
+CYAN='\033[0;36m'
+PEACH='\033[38;5;216m'
+RESET='\033[0m'
+
 # This changes the selection style
-PS3='Select your choice: '
+PS3="$(echo -e "${CYAN}Select your choice: ${RESET}")"
 # Force the terminal to show only one column
 export COLUMNS=1
 # Create a function so i can manipulate whatever color in the 256 palette
@@ -131,6 +139,10 @@ check_Wifi(){
 # Important, Make sure in the case it matches the select including the color if not won't work
 ## Main Menu
 mainMenu(){
+clear
+echo -e "\e[38;5;160m     Ishilia-Jonathan-Nicholas\e[0m"
+echo -e "   \e[38;5;196m           Main Menu\e[0m"
+
 export COLUMNS=1
 select taskOf in "$(color_Text 216 'User Management')" "$(color_Text 200 'Process Management')" "$(color_Text 155 'Service Management')" "$(color_Text 166 'Backup')" "$(color_Text 52 'Network Management')" "$(color_Text 27 'File Management')" "$(color_Text 8 'Exit')"
 do
@@ -583,15 +595,6 @@ crontab crontab.txt
 # Member 3: Ishilia
 #---------------------------------------------------
 
-# Color Variables
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[38;5;27m'
-CYAN='\033[0;36m'
-PEACH='\033[38;5;216m'
-RESET='\033[0m'
-
 #  << User Management Section>>
 
 # 1. Add a user with a specified username and password
@@ -730,7 +733,7 @@ change_user_group() {
 # User Management Menu Function
 userManagementMenu() {
     export COLUMNS=1
-    PS3="$(echo -e "${CYAN}Please select a user management option: ${RESET}")"
+    PS3="$(echo -e "${CYAN}Select your choice: ${RESET}")"
 
     options=(
 
@@ -881,7 +884,7 @@ send_file_email_attachment() {
 # File Management Menu Function
 fileManagementMenu() {
     export COLUMNS=1
-    PS3="$(echo -e "${CYAN}Please select a file management option: ${RESET}")"
+    PS3="$(echo -e "${CYAN}Select your choice: ${RESET}")"
 
     options=(
 	     "$(echo -e "${BLUE}Search for a file in user's home directory${RESET}")"
