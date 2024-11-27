@@ -143,7 +143,7 @@ do
         ManageServices
         ;;
         "$(color_Text 166 'Backup')")
-        echo "Backup"
+        Backups
         ;;
         "$(color_Text 52 'Network Management')")
         netManMenu
@@ -321,50 +321,262 @@ then
         cat latestBackup.txt
 fi
 
+echo "Please write back if you would like to go back to the main menu. "
+
 read -p " Enter the file name you would like to backup: " filename
+
+if [[ $filename == "back" || $filename == "Back" ]] ; then
+        mainMenu
+fi
+
 read -p " Enter the date for the backup (format: yyyy-mm-dd weekday): " date
+
+
+if [[ $date == "back" || $date == "Back" ]] ; then
+        mainMenu
+fi
+
 read -p " Enter the time for the backup (format: hh:mm): " Time
 
-backup_month=$date | cut -c 6,7 
-backup_day=$date | cut -c 9,10
-backup_hour=$Time | cut -c 1,2
-backup_minute=$Time | cut -c 4,5
-backup_weekDay= $date | cut -c 12-
+if [[ $date == "back" || $date == "Back" ]] ; then
+        mainMenu
+fi
 
-yyyy_mm_dd=$date | cut -c 1-10
 
-datetime="$yyyy_mm_dd"_"$Time"
+today=`date +"%Y-%m-%d %H:%M"`
 
-backup_file="${filename}_backup_${datetime}.bak"
+
+
+#get the month
+backup_Month=`echo $date | cut -c 6,7`
+#get the day
+backup_Day=`echo $date | cut -c 9,10`
+#get the hours
+backup_Hours=`echo $Time | cut -c 1,2`
+#get the minutes
+backup_Minutes=`echo $Time | cut -c 4,5`
+#get the weekday
+backup_Weekday=`echo $date | cut -c 12-`
+#get year
+getyear=`echo $date | cut -c 1,4`
+
+#checks if the month is a valid number and also checks if the day is valid
+case $backup_Month in
+        01)
+                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                echo "Invalid day [ 1-31 ]. "
+                Backups
+                fi
+        ;;
+        02)
+                if [[ $(($(($getyear + 0)) % 4)) -eq 0 && $(($(($getyear + 0)) % 100)) -eq 0 ]] ; then
+
+                                if [ $(($(($getyear + 0)) % 400)) -eq 0 ] ; then
+
+                                        if [ $(($backup_Day + 0)) -gt 29 ] ; then
+                                        echo "Invalid day [ Leap year: 1-29 ]. "
+                                        Backups
+                                        fi
+
+                        elif [[ $(($(($getyear + 0)) % 100)) -eq 0 && $(($(($getyear + 0)) % 400)) -ne 0 ]] ; then
+
+                                if [ $(($backup_Day + 0)) -gt 28 ] ; then
+                                echo "Invalid day [ Not a leap year: 1-28 ]. "
+                                Backups
+                                fi
+                        fi
+                else
+                        if [ $(($backup_Day + 0)) -gt 28 ] ; then
+                        echo "Invalid day [ Not a leap year: 1-28 ]. "
+                        Backups
+                        fi
+                fi
+        ;;
+       03)
+                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                echo "Invalid day [ 1-31 ]. "
+                Backups
+                fi
+        ;;
+        04)
+                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                echo "Invalid day [ 1-30 ]. "
+                Backups
+                fi
+        ;;
+        05)
+                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                echo "Invalid day [ 1-31 ]. "
+                Backups
+                fi
+        ;;
+        06)
+                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                echo "Invalid day [ 1-30 ]. "
+		fi
+        ;;
+        07)
+                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                echo "Invalid day [ 1-31 ]. "
+                Backups
+                fi
+        ;;
+        08)
+                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                echo "Invalid day [ 1-31 ]. "
+                Backups
+                fi
+        ;;
+        09)
+                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                echo "Invalid day [ 1-30 ]. "
+                Backups
+                fi
+        ;;
+        10)
+                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                echo "Invalid day [ 1-31 ]. "
+                Backups
+                fi
+        ;;
+        11)
+                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                echo "Invalid day [ 1-30 ]. "
+                Backups
+                fi
+        ;;
+        12)
+                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                echo "Invalid day [ 1-31 ]. "
+                Backups
+                fi
+        ;;
+        *)
+                echo "invalid month [ 01-12 ]. "
+                Backups
+        ;;
+esac
+
+# puts the weekday in a number format
+case $backup_Weekday in
+                Monday)
+                weekdayToNumber=1
+
+                ;;
+                monday)
+                weekdayToNumber=1
+                ;;
+                Tuesday)
+                weekdayToNumber=2
+
+                ;;
+                tuesday)
+                weekdayToNumber=2
+
+                ;;
+                Wednesday)
+                weekdayToNumber=3
+
+                ;;
+                wednesday)
+                weekdayToNumber=3
+
+                ;;
+                Thursday)
+                weekdayToNumber=4
+
+                ;;
+                thursday)
+                weekdayToNumber=4
+
+                ;;
+                Friday)
+                weekdayToNumber=5
+
+                ;;
+                friday)
+                weekdayToNumber=5
+
+                ;;
+                Saturday)
+                weekdayToNumber=6
+
+                ;;
+                saturday)
+                weekdayToNumber=6
+
+                ;;
+                Sunday)
+                weekdayToNumber=7
+
+                ;;
+		sunday)
+		weekdayToNumber=7
+		;;
+		*)
+                echo " Invalid weekday. "
+                read -p " Would you like to restart or go back to the main menu? [restart/back] " backNrestart
+                if [[ $backNrestart == "Back" || $backNrestart == "back" ]] ; then
+                        mainMenu
+                elif [[ $backNrestart == "restart" || $backNrestart == "Restard" ]] ; then
+                        Backups
+                else
+                        echo " Invalid input. Returning to main menu... "
+                        mainMenu
+                fi
+esac
+
+backup_date=`echo "$date" | cut -c -10`
+
+dateNtime="${backup_date}_${Time}"
+dateNtime2="$backup_date $Time"
+
+backup_file="${dateNtime}_${filename}_backup.bak"
 
 
 # Check if backup folder exists, if not, create it
-    if [ -e BackupFiles ]; then
-    	mv $backup_file BackupFiles
-    else
-        mkdir BackupFiles
-	mv $backup_file BackupFiles
-    fi
+        if [ ! find / -name "BackupFolder" 2>/dev/null ] ; then
+        mkdir BackupFolder
+        fi
 
-     # Check if file exists
-    if [ ! -f $filename ]; then
-	echo " File $filename doesn't exist. "
-	rm $backup_file
-    else
-	
-   	cp "$filename" "$backup_file"
-    fi
+Backupfolder_path=`find / -name "BackupFolder" 2>/dev/null`
 
+        # Check if file exists
+        if [ ! find . -name "$filename" 2>/dev/null ] ; then
+        echo " File $filename doesn't exist. "
+        Backups
+        else
+        file_path=`find / -name "$filename" -print 2>/dev/null`
+        fi
 
-echo "cp $filename $backup_file 
-        mv $backup_file /BackupFiles" > Backup.sh
+        if [[ "$today" > "$dateNtime2" ]] ; then
+                echo "Inserted date is in the past. "
+                echo "Do you want to continue anyways? *Disclaimer: the backup will be made immediately if yes. You will return to the start if no. [y/n]"
 
+                read choice
+                if [[ $choice == 'y' || $choice == 'Y' ]] ; then
+                        backup_file="${today}_${filename}_backup.bak"
+                        echo "#!/bin/bash" > Backup.sh
+                        echo "cp $file_path $Backupfolder_path" >> Backup.sh
+                        echo "cd $Backupfolder_path" >> Backup.sh
+                        echo "mv ${Backupfolder_path}/$filename ${Backupfolder_path}/$backup_file" >> Backup.sh
+                elif [[ $choice == 'n' || $choice == 'N' ]] ; then
+                        Backups
+                fi
+        else
+                echo "#!/bin/bash" > Backup.sh
+                echo "cp $file_path $Backupfolder_path" >> Backup.sh
+                echo "cd $Backupfolder_path" >> Backup.sh
+                echo "mv ${Backupfolder_path}/$filename ${Backupfolder_path}/$backup_file" >> Backup.sh
+        fi
+BackupScript_path=`find / -name "Backup.sh" 2>/dev/null`
 
-        echo "$backup_minute $backup_hour $backup_day $backup_month $backup_weekDay Backup.sh" > crontab.txt
-        crontab crontab.txt
+echo "$backup_Minutes $backup_Hours $backup_Day $backup_Month $weekdayToNumber $BackupScript_path" > crontab.txt
+crontab crontab.txt
 
     #When user wants to see the last time the backup process was used
-    echo "The latest backup was made in $datetime" > latestBackup.txt
+    echo "The latest backup was made in $backup_date at $Time" > latestBackup.txt
+
 }
 #---------------------------------------------------
 # Member 3: Ishilia
@@ -422,7 +634,7 @@ disconnect_user() {
 # 5. List groups a user is a member of and change a user’s group
 list_user_groups() {
     echo -e "${CYAN}Enter the username to list groups:${RESET}"
-    reaups "$username"
+    read "$username"
 }
 
 change_user_group() {
