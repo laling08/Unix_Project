@@ -131,6 +131,7 @@ check_Wifi(){
 # Important, Make sure in the case it matches the select including the color if not won't work
 ## Main Menu
 mainMenu(){
+export COLUMNS=1
 select taskOf in "$(color_Text 216 'User Management')" "$(color_Text 200 'Process Management')" "$(color_Text 155 'Service Management')" "$(color_Text 166 'Backup')" "$(color_Text 52 'Network Management')" "$(color_Text 27 'File Management')" "$(color_Text 8 'Exit')"
 do
         case $taskOf in "$(color_Text 216 'User Management')")
@@ -588,6 +589,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+PEACH='\033[38;5;216m'
 RESET='\033[0m'
 
 #  << User Management Section>>
@@ -736,8 +738,8 @@ userManagementMenu() {
              "Show a list of currently connected users"
              "Disconnect a specific remote user"
              "Show user groups"
-             "Change user group"
-             "Back to Main Menu"
+             "Change user group$"
+             "Back to Main Menu$"
              "Exit")
 
     select choice in "${options[@]}"; do
@@ -749,8 +751,8 @@ userManagementMenu() {
         5) disconnect_user ;;
         6) show_user_groups ;;
         7) change_user_group ;;
-        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
-        9) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
+        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu && break ;;
+        9) echo -e "${YELLOW}Exiting...${RESET}" && exit 0 ;;
         *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
         esac
     done
@@ -890,8 +892,8 @@ fileManagementMenu() {
         2) display_largest_files ;;
         3) display_oldest_files ;;
         4) send_file_email_attachment ;;
-        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
-        6) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
+        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu && break ;;
+        6) echo -e "${YELLOW}Exiting...${RESET}" && exit 0 ;;
         *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
         esac
     done
