@@ -1,18 +1,10 @@
 #!/bin/bash
 #-----------------------------------------------------
 ## Section Main Menu
-
-# Color Variables
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[38;5;27m'
-CYAN='\033[0;36m'
-PEACH='\033[38;5;216m'
-RESET='\033[0m'
-
+echo -e "\e[38;5;160mIshilia-Jonathan-Nicholas\e[0m"
+echo -e "   \e[48;5;0;38;5;196m Main Menu\e[0m"
 # This changes the selection style
-PS3="$(echo -e "${CYAN}Select your choice: ${RESET}")"
+PS3='Select your choice: '
 # Force the terminal to show only one column
 export COLUMNS=1
 # Create a function so i can manipulate whatever color in the 256 palette
@@ -139,11 +131,6 @@ check_Wifi(){
 # Important, Make sure in the case it matches the select including the color if not won't work
 ## Main Menu
 mainMenu(){
-clear
-echo -e "\e[38;5;160m     Ishilia-Jonathan-Nicholas\e[0m"
-echo -e "   \e[38;5;196m           Main Menu\e[0m"
-
-export COLUMNS=1
 select taskOf in "$(color_Text 216 'User Management')" "$(color_Text 200 'Process Management')" "$(color_Text 155 'Service Management')" "$(color_Text 166 'Backup')" "$(color_Text 52 'Network Management')" "$(color_Text 27 'File Management')" "$(color_Text 8 'Exit')"
 do
         case $taskOf in "$(color_Text 216 'User Management')")
@@ -595,6 +582,14 @@ crontab crontab.txt
 # Member 3: Ishilia
 #---------------------------------------------------
 
+# Color Variables
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+RESET='\033[0m'
+
 #  << User Management Section>>
 
 # 1. Add a user with a specified username and password
@@ -733,21 +728,17 @@ change_user_group() {
 # User Management Menu Function
 userManagementMenu() {
     export COLUMNS=1
-    PS3="$(echo -e "${CYAN}Select your choice: ${RESET}")"
+    PS3="$(echo -e "${CYAN}Please select a user management option: ${RESET}")"
 
-    options=(
-
-            "$(echo -e "${PEACH}Add a new user${RESET}")"
-            "$(echo -e "${PEACH}Give root permissions to a user${RESET}")"
-            "$(echo -e "${PEACH}Delete an existing user${RESET}")"
-            "$(echo -e "${PEACH}Show a list of currently connected users${RESET}")"
-            "$(echo -e "${PEACH}Disconnect a specific remote user${RESET}")"
-            "$(echo -e "${PEACH}Show user groups${RESET}")"
-            "$(echo -e "${PEACH}Change user group${RESET}")"
-            "$(echo -e "${PEACH}Back to Main Menu${RESET}")"
-            "$(echo -e "${PEACH}Exit${RESET}")"
-    )
-
+    options=("Add a new user"
+             "Give root permissions to a user"
+             "Delete an existing user"
+             "Show a list of currently connected users"
+             "Disconnect a specific remote user"
+             "Show user groups"
+             "Change user group"
+             "Back to Main Menu"
+             "Exit")
 
     select choice in "${options[@]}"; do
         case $REPLY in
@@ -758,8 +749,8 @@ userManagementMenu() {
         5) disconnect_user ;;
         6) show_user_groups ;;
         7) change_user_group ;;
-        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu && break ;;
-        9) echo -e "${YELLOW}Exiting...${RESET}" && exit 0 ;;
+        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
+        9) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
         *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
         esac
     done
@@ -884,16 +875,14 @@ send_file_email_attachment() {
 # File Management Menu Function
 fileManagementMenu() {
     export COLUMNS=1
-    PS3="$(echo -e "${CYAN}Select your choice: ${RESET}")"
+    PS3="$(echo -e "${CYAN}Please select a file management option: ${RESET}")"
 
-    options=(
-	     "$(echo -e "${BLUE}Search for a file in user's home directory${RESET}")"
-             "$(echo -e "${BLUE}Display the 10 largest files in user's home directory${RESET}")"
-             "$(echo -e "${BLUE}Display the 10 oldest files in user's home directory${RESET}")"
-             "$(echo -e "${BLUE}Send a file as an email attachment${RESET}")"
-             "$(echo -e "${BLUE}Back to Main Menu${RESET}")"
-             "$(echo -e "${BLUE}Exit${RESET}")"
-    )
+    options=("Search for a file in user's home directory"
+             "Display the 10 largest files in user's home directory"
+             "Display the 10 oldest files in user's home directory"
+             "Send a file as an email attachment"
+             "Back to Main Menu"
+             "Exit")
 
     select choice in "${options[@]}"; do
         case $REPLY in
@@ -901,8 +890,8 @@ fileManagementMenu() {
         2) display_largest_files ;;
         3) display_oldest_files ;;
         4) send_file_email_attachment ;;
-        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && mainMenu && break ;;
-        6) echo -e "${YELLOW}Exiting...${RESET}" && exit 0 ;;
+        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
+        6) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
         *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
         esac
     done
