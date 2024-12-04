@@ -1,17 +1,12 @@
 #!/bin/bash
 #-----------------------------------------------------
 ## Section Main Menu
-echo -e "\e[38;5;160mIshilia-Jonathan-Nicholas\e[0m"
-echo -e "   \e[48;5;0;38;5;196m Main Menu\e[0m"
-# This changes the selection style
-PS3='Select your choice: '
 # Force the terminal to show only one column
 export COLUMNS=1
 # Create a function so i can manipulate whatever color in the 256 palette
 color_Text(){
-	echo -e "\e[38;5;$1m$2\e[0m"
+	echo -e "\e[38;5;$1$2\e[0m"
 }
-
 #-----------------------------------------------------
 
 #-----------------------------------------------------
@@ -50,6 +45,7 @@ lis_Sys(){
 
 # To stop and close a process
 clo_Pro(){
+	lis_Sys
 	read -p "Enter the PID of the process you wish to stop and end: " pid_code
 	if (kill $pid_code); then
 		echo "Process $pid_code has been terminated"
@@ -73,7 +69,7 @@ lis_Card(){
 
 # Enable a card
 ena_Card(){
-	read -p "Enter the network interface to enable: " netId
+	read -p "Enter the network interface to enable(eth0, wlan, lo): " netId
 	sudo ip link set $netId up
 	if [ $? -eq 0 ]
 	then
@@ -85,7 +81,7 @@ ena_Card(){
 
 # Disable network card
 dis_Card(){
-	read -p "Enter the network interface to disable: " dinet
+	read -p "Enter the network interface to disable(eth0, wlan, lo): " dinet
 	sudo ip link set $dinet down
 	if [ $? -eq 0 ]
 	then
@@ -131,334 +127,527 @@ check_Wifi(){
 # Important, Make sure in the case it matches the select including the color if not won't work
 ## Main Menu
 mainMenu(){
-select taskOf in "$(color_Text 216 'User Management')" "$(color_Text 200 'Process Management')" "$(color_Text 155 'Service Management')" "$(color_Text 166 'Backup')" "$(color_Text 52 'Network Management')" "$(color_Text 27 'File Management')" "$(color_Text 8 'Exit')"
-do
-        case $taskOf in "$(color_Text 216 'User Management')")
-        userManagementMenu
-        ;;
-        "$(color_Text 200 'Process Management')")
-        sys_Sta_Menu
-        ;;
-        "$(color_Text 155 'Service Management')")
-        ManageServices
-        ;;
-        "$(color_Text 166 'Backup')")
-        Backups
-        ;;
-        "$(color_Text 52 'Network Management')")
-        netManMenu
-        ;;
-        "$(color_Text 27 'File Management')")
-        fileManagementMenu
-        ;;
-        "$(color_Text 8 'Exit')")
-        echo "You Are Exiting Now..."
-        exit 0
-        ;;
-        *)
-        echo "Invalid Option"
-        ;;
+# Define menu items with colored text
+menu_items=(
+    "$(color_Text 216m 'User Management')"
+    "$(color_Text 200m 'Process Management')"
+    "$(color_Text 155m 'Service Management')"
+    "$(color_Text 166m 'Backup')"
+    "$(color_Text 196m 'Network Management')"
+    "$(color_Text 25m 'File Management')"
+    "$(color_Text 8m 'Exit')"
+)
+printf "%150s %s\n" "$(color_Text 196m '---------------------------------')"
+printf "%145s %s\n" "$(color_Text 196m 'Ishilia-Jonathan-Nicholas')"
+printf "%136s %s\n" "$(color_Text 196m 'Main Menu')"
+printf "%150s %s\n" "$(color_Text 196m '---------------------------------')"
+export COLUMNS=1
+	for i in "${!menu_items[@]}"; do
+		printf "%110s) %s\n" "$((i + 1))" "${menu_items[$i]}"
+	done
+	echo
+	read -p "Enter your choice: " choice
+      case $choice in
+            1)
+		clear
+                userManMenu
+		;;
+            2)
+		clear
+        	sys_Sta_Menu
+                ;;
+            3)
+                clear
+		servManMenu
+		;;
+            4)
+                clear
+		BackUpMenu
+		;;
+            5)
+		clear
+             	netManMenu
+                ;;
+            6)
+                clear
+		fileManMenu
+		;;
+            7)
+                echo "You Are Exiting Now..."
+                exit 0
+                ;;
+            *)
+                echo "Invalid Option"
+		sleep 1
+		clear
+                mainMenu
+                ;;
         esac
-done
 }
-
 #----------------------------------------------------
 # Important, Make sure in the case it matches the select including the color if not won't work
 ## System Status Menu
 sys_Sta_Menu(){
 export COLUMNS=1
+System_items=(
+		"$(color_Text 200m 'Check Memory Status')"
+		"$(color_Text 200m 'Check CPU Temperature')"
+		"$(color_Text 200m 'List Active Processes')"
+		"$(color_Text 200m 'Stop A Process')"
+		"$(color_Text 200m 'Exit')"
+		"$(color_Text 200m 'Back')"
+)
+printf "%150s %s\n" "$(color_Text 200m '---------------------------------')"
+printf "%144s %s\n" "$(color_Text 200m 'System Management')"
+printf "%150s %s\n" "$(color_Text 200m '---------------------------------')"
 
-select statusSys in "$(color_Text 200 'Check Memory Status')" "$(color_Text 200 'Check CPU Temperature')" "$(color_Text 200 'List Active Processes')" "$(color_Text 200 'Stop A Process')" "$(color_Text 200 'Exit')" "$(color_Text 200 'Back')"
-                do
-                case $statusSys in "$(color_Text 200 'Check Memory Status')")
+	for i in "${!System_items[@]}"; do
+                printf "%110s) %s\n" "$((i + 1))" "${System_items[$i]}"
+        done
+        echo
+        read -p "Enter your choice: " choiceOf
+
+        case $choiceOf in
+		1)
                 mem_Show
 		echo
 		sys_Sta_Menu
                 ;;
-                "$(color_Text 200 'Check CPU Temperature')")
+                2)
                 check_Temp
 		echo
 		sys_Sta_Menu
                 ;;
-                "$(color_Text 200 'List Active Processes')")
+                3)
                 lis_Sys
 		echo
 		sys_Sta_Menu
                 ;;
-                "$(color_Text 200 'Stop A Process')")
+                4)
                 clo_Pro
 		echo
 		sys_Sta_Menu
                 ;;
-                "$(color_Text 200 'Exit')")
+                5)
                 echo "You Are Exiting..."
                 exit 0
                 ;;
-                "$(color_Text 200 'Back')")
+                6)
+		clear
                 mainMenu
                 ;;
                 *)
                 echo "Invalid Option"
+		sleep 1
+		clear
+		sys_Sta_Menu
                 ;;
-             	esac
-           	done
+	esac
 }
 
 #------------------------------------------------------
 ## Network Management Menu
 netManMenu(){
 export COLUMNS=1
+Network_items=(
+		"$(color_Text 196m 'List Network Cards')"
+		"$(color_Text 196m 'Enable A Network Card')"
+		"$(color_Text 196m 'Disable A Network Card')"
+		"$(color_Text 196m 'Set IP Address To A Network Card')"
+		"$(color_Text 196m 'List Of Wifi Nearby')"
+		"$(color_Text 196m 'Exit')"
+		"$(color_Text 196m 'Back')"
+)
+printf "%150s %s\n" "$(color_Text 196m '---------------------------------')"
+printf "%145s %s\n" "$(color_Text 196m 'Network Management')"
+printf "%150s %s\n" "$(color_Text 196m '---------------------------------')"
 
-select netMan in "$(color_Text 52 'List Network Cards')" "$(color_Text 52 'Enable A Network Card')" "$(color_Text 52 'Disable A Network Card')" "$(color_Text 52 'Set IP Address To A Network Card')" "$(color_Text 52 'List Of Wifi Nearby')" "$(color_Text 52 'Exit')" "$(color_Text 52 'Back')"
-do
-	case $netMan in "$(color_Text 52 'List Network Cards')")
+        for i in "${!Network_items[@]}"; do
+                printf "%110s) %s\n" "$((i + 1))" "${Network_items[$i]}"
+        done
+        echo
+	read -p "Enter your choice: " choiceNet
+	case $choiceNet in
+	1)
 	lis_Card
 	echo
 	netManMenu
 	;;
-	"$(color_Text 52 'Enable A Network Card')")
+	2)
 	ena_Card
 	echo
 	netManMenu
 	;;
-	"$(color_Text 52 'Disable A Network Card')")
+	3)
 	dis_Card
 	echo
 	netManMenu
 	;;
-	"$(color_Text 52 'Set IP Address To A Network Card')")
+	4)
 	recset_Card
 	echo
 	netManMenu
 	;;
-	"$(color_Text 52 'List Of Wifi Nearby')")
+	5)
 	check_Wifi
 	echo
 	netManMenu
 	;;
-	"$(color_Text 52 'Exit')")
+	6)
 	echo "You Are Exiting..."
 	exit 0
 	;;
-	"$(color_Text 52 'Back')")
+	7)
+	clear
 	mainMenu
 	;;
 	*)
 	echo "Invalid Option"
+	sleep 1
+	clear
+	netManMenu
 	;;
 	esac
-done
 }
 #---------------------------------------------------
-## Listing services
 
-List_Services(){
-if [ ! -f services.txt ]; then
-touch services.txt
-fi
+# Color variables
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+RESET='\033[0m'
 
-echo " Would you like to list all the services? "
 
-select option in "Yes" "No"
-do
-	case $option in
-	"Yes")
-		systemctl --type=service >> services.txt
-                cat services.txt
-                :>services.txt
-                break
-		;;
-        "No")
-                break
-		;;
-        *)
-                echo " Invalid input. [1-2] "
-		;;
+# User Management Section
+
+
+# 1. Add a user with a specified username and password
+add_user() {
+    echo -e "${CYAN}Enter username to add:${RESET}"
+    read username
+    echo -e "${CYAN}Enter password for $username:${RESET}"
+    read -s password
+    sudo useradd -m "$username" && echo "$username:$password" | sudo chpasswd
+    echo -e "${GREEN}User $username has been added.${RESET}"
+}
+
+
+# 2. Grant root permission to a user
+grant_root_permission() {
+    echo -e "${CYAN}Enter the username to grant root permissions:${RESET}"
+    read username
+    sudo usermod -aG sudo "$username"
+    echo -e "${GREEN}$username has been granted root permissions.${RESET}"
+}
+
+
+# 3. Delete a user
+delete_user() {
+    echo -e "${CYAN}Enter the username to delete:${RESET}"
+    read username
+    sudo userdel -r "$username"
+    echo -e "${GREEN}User $username has been deleted.${RESET}"
+}
+
+
+# 4. Display connected users and disconnect a selected remote user
+display_connected_users() {
+    echo -e "${CYAN}Currently connected users:${RESET}"
+    who
+}
+
+
+disconnect_user() {
+    echo -e "${CYAN}Enter the username of the user to disconnect:${RESET}"
+    read username
+    sudo pkill -KILL -u "$username"
+    echo -e "${GREEN}User $username has been disconnected.${RESET}"
+}
+
+
+# 5. List groups a user is a member of and change a user's group
+list_user_groups() {
+    echo -e "${CYAN}Enter the username to list groups:${RESET}"
+    read username
+    groups "$username"
+}
+
+
+change_user_group() {
+    echo -e "${CYAN}Enter the username to change group:${RESET}"
+    read username
+    echo -e "${CYAN}Enter the new group for $username:${RESET}"
+    read group
+    sudo usermod -g "$group" "$username"
+    echo -e "${GREEN}User $username's group has been changed to $group.${RESET}"
+}
+## ------------------------------------------------------------------------------
+
+# File Management Section
+printf "%145s %s\n" $(echo -e "${YELLOW}Select User Management Task:${RESET}")
+
+
+# 1. Search for a file in a specified user's home directory and display its path
+search_file() {
+    echo -e "${CYAN}Enter the username to search their home directory:${RESET}"
+    read username
+    echo -e "${CYAN}Enter the file name to search:${RESET}"
+    read filename
+    find /home/"$username" -name "$filename" 2>/dev/null
+}
+
+
+# 2. Display the 10 largest files in a user's home directory
+largest_files() {
+    echo -e "${CYAN}Enter the username to list largest files:${RESET}"
+    read username
+    find /home/"$username" -type f -exec du -h {} + | sort -rh | head -n 10
+}
+
+
+# 3. Display the 10 oldest files in a user's home directory
+oldest_files() {
+    echo -e "${CYAN}Enter the username to list oldest files:${RESET}"
+    read username
+    find /home/"$username" -type f -exec ls -lt {} + | tail -n 10
+}
+
+
+# 4. Email a file as an attachment based on user-provided email and file name
+email_file() {
+    echo -e "${CYAN}Enter the email address to send the file to:${RESET}"
+    read email
+    echo -e "${CYAN}Enter the username whose file you want to send:${RESET}"
+    read username
+    echo -e "${CYAN}Enter the file name to send:${RESET}"
+    read filename
+    echo -e "${CYAN}Enter the subject of the email:${RESET}"
+    read subject
+    echo -e "${CYAN}Enter the body of the email:${RESET}"
+    read body
+    # Send the email using mail command (ensure mailutils is installed)
+    echo "$body" | mail -s "$subject" -A /home/"$username"/"$filename" "$email"
+    echo -e "${GREEN}File $filename has been sent to $email.${RESET}"
+}
+## --------------------------------------------------------------------------------
+
+# Main Menu to Call Functions
+## UserManagement
+userManMenu(){
+export COLUMNS=1
+printf "%160s %s\n" "$(color_Text ${CYAN} '----------------------------------'${RESET})"
+printf "%153s %s\n" "$(color_Text ${CYAN} 'User Management'${RESET})"
+printf "%160s %s\n" "$(color_Text ${CYAN} '----------------------------------'${RESET})"
+printf "%155s %s\n" "$(color_Text ${YELLOW}'Select User Management Task: '${RESET})"
+printf "%148s %s\n" "$(color_Text ${CYAN}'1) Add a user' ${RESET})"
+printf "%159s %s\n" "$(color_Text ${CYAN}'2) Grant root permission'${RESET})"
+printf "%151s %s\n" "$(color_Text ${CYAN}'3) Delete a user'${RESET})"
+printf "%161s %s\n" "$(color_Text ${CYAN}'4) Display connected users'${RESET})"
+printf "%155s %s\n" "$(color_Text ${CYAN}'5) Disconnect a user'${RESET})"
+printf "%154s %s\n" "$(color_Text ${CYAN}'6) List user groups'${RESET})"
+printf "%155s %s\n" "$(color_Text ${CYAN}'7) Change user group'${RESET})"
+printf "%142s %s\n" "$(color_Text ${CYAN}'8) Exit'${RESET})"
+printf "%142s %s\n" "$(color_Text ${CYAN}'9) Back'${RESET})"
+        read -p "Enter your choice: " user_choice
+
+        case $user_choice in
+            1) add_user; echo; userManMenu ;;
+            2) grant_root_permission; echo; userManMenu ;;
+            3) delete_user ;;
+            4) display_connected_users; echo; userManMenu ;;
+            5) disconnect_user; echo; userManMenu ;;
+            6) list_user_groups; echo; userManMenu ;;
+            7) change_user_group; echo; userManMenu ;;
+	    8) echo "You are exiting..."; exit 0 ;;
+	    9) clear; mainMenu ;;
+            *) echo -e "${RED}Invalid choice${RESET}"; sleep 1; clear; userManMenu ;;
+        esac
+}
+## --------------------------------------------------------------------------------------
+
+# File Management Menu
+fileManMenu(){
+printf "%160s %s\n" "$(color_Text ${CYAN} '----------------------------------'${RESET})"
+printf "%153s %s\n" "$(color_Text ${CYAN} 'File Management'${RESET})"
+printf "%160s %s\n" "$(color_Text ${CYAN} '----------------------------------'${RESET})"
+printf "%155s %s\n" "$(color_Text ${YELLOW}'Select File Management Task: '${RESET})"
+printf "%155s %s\n" "$(color_Text ${CYAN}'1) Search for a file'${RESET})"
+printf "%159s %s\n" "$(color_Text ${CYAN}'2) List 10 largest files'${RESET})"
+printf "%158s %s\n" "$(color_Text ${CYAN}'3) List 10 oldest files'${RESET})"
+printf "%150s %s\n" "$(color_Text ${CYAN}'4) Email a file'${RESET})"
+printf "%142s %s\n" "$(color_Text ${CYAN}'5) Exit'${RESET})"
+printf "%142s %s\n" "$(color_Text ${CYAN}'6) Back'${RESET})"
+	read -p "Enter your choice: " file_choice
+
+        case $file_choice in
+            1) search_file; echo ;;
+            2) largest_files; echo ;;
+            3) oldest_files; echo ;;
+            4) email_file; echo ;;
+            5) echo "You are exiting..."; exit 0 ;;
+	    6) clear; mainMenu ;;
+	    *) echo -e "${RED}Invalid choice${RESET}"; sleep 1; clear; fileManMenu ;;
 	esac
-done
 }
-#---------------------------------------------------
-## Service management
+## ------------------------------------------------------------
 
-ManageServices(){
-            ListServices
-            read -p " Which service would you like to manage?: " service
-            echo " Would you like to stop or start the service? "
+# Backups Section
 
-            select Manage in "Stop" "Start"
-            do
-                    case $Manage in
-                    "Stop")
-                            echo " Stopping service ${service}... "
-                            sudo systemctl stop "$service"
-                            echo " Service $service stopped. "
-							ServiceManage
-                            ;;
-                    "Start")
-                            echo " Starting service ${service}... "
-                            sudo systemctl start "$service"
-                            echo " Service $service started. "
-							ServiceManage
-                            ;;
-                    "Restart")
-                            echo " Restarting service ${service}... "
-                            sudo systemctl restart "$service"
-                            echo " Service $service restarted. "
-                            ServiceManage
-                            ;;
-                        *)
-                            echo " Invalid input. [1-3] "
-                            ;;
-                        esac
-                done
+
+#Backup now
+BackupNow(){
+Date=`date +"%Y-%m-%d_%H:%M"`
+filename=$1
+
+backupFile="${Date}_${filename}.bak"
+
+
+if [ ! find / -name "BackupFolder" 2>/dev/null ] ; then
+        mkdir BackupFolder
+        fi
+
+Backupfolder_path=`find / -name "BackupFolder" 2>/dev/null`
+
+# Check if file exists
+if [ ! find . -name "$filename" 2>/dev/null ] ; then
+    echo " File $filename doesn't exist. "
+    Backups
+else
+    file_path=`find / -name "$filename" -print 2>/dev/null`
+fi
+
+backup_file="${Date}_${filename}_backup.bak"
+
+echo "Backup in progress..."
+sleep 1
+cp $file_path $backup_file
+mv $backup_file $Backupfolder_path
+clear
 }
-#---------------------------------------------------
-## Backups
 
-Backups(){
-if [ -e latestBackup.txt ];
-then
-        cat latestBackup.txt
-fi
+# ------------------------------------------------------------
 
-echo "Please write back if you would like to go back to the main menu. "
-
-read -p " Enter the file name you would like to backup: " filename
-
-if [[ $filename == "back" || $filename == "Back" ]] ; then
-        mainMenu
-fi
-
-read -p " Enter the date for the backup (format: yyyy-mm-dd weekday): " date
-
-
-if [[ $date == "back" || $date == "Back" ]] ; then
-        mainMenu
-fi
-
-read -p " Enter the time for the backup (format: hh:mm): " Time
-
-if [[ $date == "back" || $date == "Back" ]] ; then
-        mainMenu
-fi
-
-
-today=`date +"%Y-%m-%d %H:%M"`
-
-
-
-#get the month
-backup_Month=`echo $date | cut -c 6,7`
-#get the day
-backup_Day=`echo $date | cut -c 9,10`
-#get the hours
-backup_Hours=`echo $Time | cut -c 1,2`
-#get the minutes
-backup_Minutes=`echo $Time | cut -c 4,5`
-#get the weekday
-backup_Weekday=`echo $date | cut -c 12-`
-#get year
-getyear=`echo $date | cut -c 1,4`
+#Checks if the date is valid and then make the backup script and cronjob creating the backup
+validateAndMake(){
+today=`date +"%Y.%-m.%-e %H:%M"`
 
 #checks if the month is a valid number and also checks if the day is valid
-case $backup_Month in
+case $2 in
         01)
-                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                if [ $(($3 + 0)) -gt 31 ] ; then
+                clear
                 echo "Invalid day [ 1-31 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         02)
-                if [[ $(($(($getyear + 0)) % 4)) -eq 0 && $(($(($getyear + 0)) % 100)) -eq 0 ]] ; then
+                if [[ $(($(($1 + 0)) % 4)) -eq 0 && $(($(($1 + 0)) % 100)) -eq 0 ]] ; then
 
-                                if [ $(($(($getyear + 0)) % 400)) -eq 0 ] ; then
+                                if [ $(($(($1 + 0)) % 400)) -eq 0 ] ; then
 
-                                        if [ $(($backup_Day + 0)) -gt 29 ] ; then
+                                        if [ $(($3 + 0)) -gt 29 ] ; then
+                                        clear
                                         echo "Invalid day [ Leap year: 1-29 ]. "
-                                        Backups
+                                        BackupDate
                                         fi
 
-                        elif [[ $(($(($getyear + 0)) % 100)) -eq 0 && $(($(($getyear + 0)) % 400)) -ne 0 ]] ; then
+                        elif [[ $(($(($1 + 0)) % 100)) -eq 0 && $(($(($1 + 0)) % 400)) -ne 0 ]] ; then
 
-                                if [ $(($backup_Day + 0)) -gt 28 ] ; then
+                                if [ $(($3 + 0)) -gt 28 ] ; then
+                                clear
                                 echo "Invalid day [ Not a leap year: 1-28 ]. "
-                                Backups
+                                BackupDate
                                 fi
                         fi
                 else
-                        if [ $(($backup_Day + 0)) -gt 28 ] ; then
+                        if [ $(($3 + 0)) -gt 28 ] ; then
+                        clear
                         echo "Invalid day [ Not a leap year: 1-28 ]. "
-                        Backups
+                        BackupDate
                         fi
                 fi
         ;;
        03)
-                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                if [ $(($3 + 0)) -gt 31 ] ; then
+                clear
                 echo "Invalid day [ 1-31 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         04)
-                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                if [ $(($3 + 0)) -gt 30 ] ; then
+                clear
                 echo "Invalid day [ 1-30 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         05)
-                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                if [ $(($3 + 0)) -gt 31 ] ; then
+                clear
                 echo "Invalid day [ 1-31 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         06)
-                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                if [ $(($3 + 0)) -gt 30 ] ; then
+                clear
                 echo "Invalid day [ 1-30 ]. "
+                backupDate
 		fi
         ;;
         07)
-                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                if [ $(($3 + 0)) -gt 31 ] ; then
+                clear
                 echo "Invalid day [ 1-31 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         08)
-                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                if [ $(($3 + 0)) -gt 31 ] ; then
+                clear
                 echo "Invalid day [ 1-31 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         09)
-                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                if [ $(($3 + 0)) -gt 30 ] ; then
+                clear
                 echo "Invalid day [ 1-30 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         10)
-                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+                if [ $(($3 + 0)) -gt 31 ] ; then
+                clear
                 echo "Invalid day [ 1-31 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
         11)
-                if [ $(($backup_Day + 0)) -gt 30 ] ; then
+                if [ $(($3 + 0)) -gt 30 ] ; then
+                clear
                 echo "Invalid day [ 1-30 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
-        12)
-                if [ $(($backup_Day + 0)) -gt 31 ] ; then
+        12)     
+                if [ $(($3 + 0)) -gt 31 ] ; then
+                clear
                 echo "Invalid day [ 1-31 ]. "
-                Backups
+                BackupDate
                 fi
         ;;
-        *)
-                echo "invalid month [ 01-12 ]. "
-                Backups
+        *)      
+                clear
+                echo "invalid month [ 1-12 ]. "
+                BackupDate
         ;;
 esac
 
 # puts the weekday in a number format
-case $backup_Weekday in
+case $4 in
                 Monday)
                 weekdayToNumber=1
 
@@ -510,392 +699,391 @@ case $backup_Weekday in
                 weekdayToNumber=7
 
                 ;;
-		sunday)
-		weekdayToNumber=7
-		;;
-		*)
+		        sunday)
+		        weekdayToNumber=7
+		        ;;
+		        *)
                 echo " Invalid weekday. "
-                read -p " Would you like to restart or go back to the main menu? [restart/back] " backNrestart
-                if [[ $backNrestart == "Back" || $backNrestart == "back" ]] ; then
+                PS3="*$(color_Text 9m 'Disclaimer, if you restart, you will have to insert all of the date again') [$(color_Text 9 'restart')/$(color_Text 11 'back')]:"
+                echo "$(color_Text 166m 'Would you like to restart or go back to the main menu?: ')"
+                select backNrestart in "$(color_Text 166m 'Restart')" "$(color_Text 166m 'Go back to the main menu')"
+                do
+                case $backNrestart in
+
+                "$(color_Text 166m 'Restart')")
+                    clear
+                    backupDate
+                    ;;
+                "$(color_Text 166m 'Go back to the main menu')")
+                        clear
                         mainMenu
-                elif [[ $backNrestart == "restart" || $backNrestart == "Restard" ]] ; then
-                        Backups
-                else
-                        echo " Invalid input. Returning to main menu... "
-                        mainMenu
-                fi
+                    ;;
+                esac
+                done
+
+
 esac
 
-backup_date=`echo "$date" | cut -c -10`
-
-dateNtime="${backup_date}_${Time}"
-dateNtime2="$backup_date $Time"
-
-backup_file="${dateNtime}_${filename}_backup.bak"
+backup_Date="$1.$2.$3 $5:$6"
 
 
-# Check if backup folder exists, if not, create it
-        if [ ! find / -name "BackupFolder" 2>/dev/null ] ; then
+
+dateNtime="${1}-${2}-${3}_${5}:${6}"
+
+
+        if [[ "$today" > "$backup_Date" ]] ; then
+                echo "$(color_Text 9 'Inserted date is in the past.')"
+                echo "$(color_Text 166 ' Do you want to continue anyways? ')"
+                PS3="$(color_Text 9 '*Disclaimer, the backup will be made immediately if yes. You will need to re-enter the date if no.') [$(color_Text 10 'Yes')/$(color_Text 9 'No')/$(color_Text 11 'Exit')] : "
+                select choice in "$(color_Text 10 'Yes')" "$(color_Text 9 'No')" "$(color_Text 11 'Exit')"
+                do
+                    case $choice in
+                        "$(color_Text 10 'Yes')")
+                        makeBackupNow $filename $weekdayToNumber
+                        mainMenu
+			break
+                        ;;
+                        "$(color_Text 9 'No')")
+                        clear
+                        backupDate
+			break
+                        ;;
+                        "$(color_Text 11 'Exit')")
+                        mainMenu
+			break
+                        ;;
+                        *)
+                        echo "$(color_Text 9 'Invalid input [1-3]')"
+                        ;;
+                    esac
+                done
+	fi
+            #When user wants to see the last time the backup process was used
+	if [ ! -e "latestBackup.txt" ] ; then
+
+    echo "The latest backup was or will be made in $backup_Date" > latestBackup.txt
+	fi
+
+    backupFile="${dateNtime}_${filename}.bak"
+
+    minute=$6
+    hour=$5
+    day=$3
+    month=$2
+
+if [ ! find / -name "BackupFolder" 2>/dev/null ] ; then
         mkdir BackupFolder
         fi
 
 Backupfolder_path=`find / -name "BackupFolder" 2>/dev/null`
 
-        # Check if file exists
-        if [ ! find . -name "$filename" 2>/dev/null ] ; then
-        echo " File $filename doesn't exist. "
-        Backups
-        else
-        file_path=`find / -name "$filename" -print 2>/dev/null`
-        fi
+# Check if file exists
+if [ ! find . -name "$filename" 2>/dev/null ] ; then
+    echo " File $filename doesn't exist. "
+    Backups
+else
+    file_path=`find / -name "$filename" -print 2>/dev/null`
+fi
 
-        if [[ "$today" > "$dateNtime2" ]] ; then
-                echo "Inserted date is in the past. "
-                echo "Do you want to continue anyways? *Disclaimer: the backup will be made immediately if yes. You will return to the start if no. [y/n]"
 
-                read choice
-                if [[ $choice == 'y' || $choice == 'Y' ]] ; then
-                        backup_file="${today}_${filename}_backup.bak"
-                        echo "#!/bin/bash" > Backup.sh
-                        echo "cp $file_path $Backupfolder_path" >> Backup.sh
-                        echo "cd $Backupfolder_path" >> Backup.sh
-                        echo "mv ${Backupfolder_path}/$filename ${Backupfolder_path}/$backup_file" >> Backup.sh
-                elif [[ $choice == 'n' || $choice == 'N' ]] ; then
-                        Backups
-                fi
-        else
-                echo "#!/bin/bash" > Backup.sh
-                echo "cp $file_path $Backupfolder_path" >> Backup.sh
-                echo "cd $Backupfolder_path" >> Backup.sh
-                echo "mv ${Backupfolder_path}/$filename ${Backupfolder_path}/$backup_file" >> Backup.sh
-        fi
-BackupScript_path=`find / -name "Backup.sh" 2>/dev/null`
 
-echo "$backup_Minutes $backup_Hours $backup_Day $backup_Month $weekdayToNumber $BackupScript_path" > crontab.txt
-crontab crontab.txt
 
+second=`date +"%S"`
+
+echo "Creating backup script..."
+
+echo "#!/bin/bash" > Backup${hour}:${minute}:${second}.sh
+echo "cp $file_path $Backupfolder_path" >> Backup${hour}:${minute}:${second}.sh
+echo "cd $Backupfolder_path" >> Backup${hour}:${minute}:${second}.sh
+echo "mv $filename $backupFile" >> Backup${hour}:${minute}:${second}.sh
+
+BackupScript_Path=`find / -name "Backup${hour}:${minute}:${second}.sh" -print 2>/dev/null`
+
+echo "rm $BackupScript_Path" >> Backup${hour}:${minute}:${second}.sh
+
+sudo chmod 777 Backup${hour}:${minute}:${second}.sh
+
+BackupScript_path=`find / -name "Backup${hour}:${minute}:${second}.sh" 2>/dev/null`
+
+echo "Creating cron job..."
+
+echo "$minute $hour $day $month $weekdayToNumber $BackupScript_path" > crontab.txt
+crontab -l > crontabTemp.txt
+cat crontab.txt crontabTemp.txt > crontab2.txt
+crontab crontab2.txt
+
+echo "Cron job created."
+sleep 1
+clear
+BackUpMenu
+}
+
+#---------------------------------------------------
+
+#Asks the user to input the date
+BackupDate(){
+filename=$1
+echo "$(color_Text 166m "Backuping ${filename}.")"
+echo "$(color_Text 11m 'Please write back at any time to go back to the backup menu')"
+
+read -p "$(color_Text 166m 'Enter the year of the backup date (Year must not be in the past): ')" year
+
+
+if [[ $year == "back" || $year == "Back" ]] ; then
+        mainMenu
+fi
+
+read -p "$(color_Text 166m 'Enter the month of the backup date (Month must not be in the past): ')" month
+
+
+if [[ $month == "back" || $month == "Back" ]] ; then
+        mainMenu
+fi
+
+
+read -p "$(color_Text 166m 'Enter the day of the backup date (Day must not be in the past): ')" day
+
+
+if [[ $day == "back" || $day == "Back" ]] ; then
+        mainMenu
+fi
+
+read -p "$(color_Text 166m 'Enter the day of the week the day is in: ')" weekday
+
+
+if [[ $weekday == "back" || $weekday == "Back" ]] ; then
+        mainMenu
+fi
+
+read -p "$(color_Text 166m 'Enter the hour of the backup [00-24]: ')" hour
+
+if [[ $hour == "back" || $hour == "Back" ]] ; then
+        mainMenu
+fi
+
+read -p "$(color_Text 166m' Enter the minute of the backup [00-59]: ')" minute
+
+
+if [[ $minute == "back" || $minute == "Back" ]] ; then
+        mainMenu
+fi
+
+clear
+validateAndMake $year $month $day $weekday $hour $minute $filename
+}
+
+# ------------------------------------------------------
+
+# asks for the filename you want to backup and then immediately backups
+
+backFol_BackNow(){
+read -p "$(color_Text 166m 'Enter the file name you would like to backup: ')" filename
+BackupNow $filename
+
+}
+
+# ------------------------------------------------------
+
+# asks for the filename you want to backup and redirects you to inserting date and time for backup
+backFol(){
+read -p "$(color_Text 166m 'Enter the file name you would like to backup: ')" filename
+BackupDate $filename
+
+}
+
+ShoSta(){
     #When user wants to see the last time the backup process was used
-    echo "The latest backup was made in $backup_date at $Time" > latestBackup.txt
-
-}
-#---------------------------------------------------
-# Member 3: Ishilia
-#---------------------------------------------------
-
-# Color Variables
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-RESET='\033[0m'
-
-#  << User Management Section>>
-
-# 1. Add a user with a specified username and password
-add_user() {
-    echo -e "${CYAN}Enter the username for the new user:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    echo -e "${CYAN}Enter the password for the new user:${RESET}"
-    read -s password
-    if [ -z "$password" ]; then
-        echo -e "${RED}Password cannot be empty.${RESET}"
-        return 1
-    fi
-
-    sudo useradd -m -p $(openssl passwd -1 "$password") "$username" && \
-    echo -e "${GREEN}User $username added successfully.${RESET}" || \
-    echo -e "${RED}Failed to add user $username.${RESET}"
-}
-
-# 2. Give Root Permissions to a User
-give_root_permission() {
-    echo -e "${CYAN}Enter the username to give root permissions:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    sudo usermod -aG sudo "$username" && \
-    echo -e "${GREEN}User $username is now a sudoer.${RESET}" || \
-    echo -e "${RED}Failed to grant sudo permissions to $username.${RESET}"
-}
-
-# 3. Delete a User
-delete_user() {
-    echo -e "${CYAN}Enter the username to delete:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    sudo userdel -r "$username" && \
-    echo -e "${GREEN}User $username deleted successfully.${RESET}" || \
-    echo -e "${RED}Failed to delete user $username.${RESET}"
-}
-
-# 4. Show a  List of Currently Connected Users
-show_connected_users() {
-    echo -e "${CYAN}Currently connected users:${RESET}"
-    who || echo -e "${RED}Failed to list connected users.${RESET}"
-}
-
-# 5. Disconnect a Specific Remote User
-disconnect_user() {
-    echo -e "${CYAN}Enter the username to disconnect:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! who | grep -q "$username"; then
-        echo -e "${RED}User $username is not connected.${RESET}"
-        return 1
-    fi
-
-    sudo pkill -KILL -u "$username" && \
-    echo -e "${GREEN}User $username disconnected successfully.${RESET}" || \
-    echo -e "${RED}Failed to disconnect user $username.${RESET}"
-}
-
-# 6. Show the List of All Groups That a User Is a Member Of
-show_user_groups() {
-    echo -e "${CYAN}Enter the username to show groups for:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    groups "$username" || echo -e "${RED}Failed to show groups for $username.${RESET}"
-}
-
-# 7. Change the User Group
-change_user_group() {
-    echo -e "${CYAN}Enter the username to change the group for:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    echo -e "${CYAN}Enter the new group for $username:${RESET}"
-    read group
-    if [ -z "$group" ]; then
-        echo -e "${RED}Group name cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! getent group "$group" &>/dev/null; then
-        echo -e "${RED}Group $group does not exist.${RESET}"
-        return 1
-    fi
-
-    sudo usermod -g "$group" "$username" && \
-    echo -e "${GREEN}User $username group changed to $group.${RESET}" || \
-    echo -e "${RED}Failed to change user $username group.${RESET}"
+    if [ ! find / -name "latestBackup.txt" -print 2>/dev/null ] ; then
+        echo "$(color_Text 166m 'No backups have been made yet.')"
+        else
+    path=`find / -name "latestBackup.txt" -print 2>/dev/null`
+        cat "$path"
+        fi
+echo "$(color_Text 166m 'Go back? or Exit')"
+select backExit in "$(color_Text 11m 'Go back')" "Exit"
+do
+	case $backExit in
+	"$(color_Text 11m 'Go back')")
+		clear
+		BackUpMenu
+	break
+	;;
+	"Exit")
+	echo "You are exiting..."
+	exit 0
+	;;
+	*)
+	echo "$(color_Text 9m 'Invalid option.')"
+	;;
+	esac
+done
 }
 
 
-# User Management Menu Function
-userManagementMenu() {
-    export COLUMNS=1
-    PS3="$(echo -e "${CYAN}Please select a user management option: ${RESET}")"
+# ------------------------------------------------------
 
-    options=("Add a new user"
-             "Give root permissions to a user"
-             "Delete an existing user"
-             "Show a list of currently connected users"
-             "Disconnect a specific remote user"
-             "Show user groups"
-             "Change user group"
-             "Back to Main Menu"
-             "Exit")
+## Service management
 
-    select choice in "${options[@]}"; do
-        case $REPLY in
-        1) add_user ;;
-        2) give_root_permission ;;
-        3) delete_user ;;
-        4) show_connected_users ;;
-        5) disconnect_user ;;
-        6) show_user_groups ;;
-        7) change_user_group ;;
-        8) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
-        9) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
-        *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
+ListServices(){
+systemctl --type=service --all | awk '{printf "%-65s %-10s\n", $1, $3}' | head -n -5
+echo "$(color_Text 155m 'Go back? or Exit')"
+
+select BackExit in "$(color_Text 14m 'Go back')" "Exit"
+do
+	case $BackExit in
+	"$(color_Text 14m 'Go back')")
+	clear
+	servManMenu
+	break
+	;;
+	"Exit")
+	echo "You are exiting..."
+	exit 0
+	;;
+	*)
+	echo "$(color_Text 9m 'Invalid option.')"
+	;;
+	esac
+done
+}
+
+ListServices_NoClear(){
+systemctl --type=service --all | awk '{printf "%-65s %-10s\n", $1, $3}' | head -n -5
+}
+
+
+ManageServices(){
+echo "$(color_Text 155m 'List services?')"
+select YesNo in "$(color_Text 10m 'Yes')" "$(color_Text 9m 'No')" "$(color_Text 14m 'Back')" "Exit"
+do
+	case $YesNo in
+	"$(color_Text 10m 'Yes')")
+		ListServices_NoClear
+	break
+	;;
+	"$(color_Text 9m 'No')")
+	break
+	;;
+	"$(color_Text 14m 'Back')")
+	servManMenu
+	break
+	;;
+	"Exit")
+	echo "You are exiting..."
+	exit 0
+	;;
+	*)
+	echo "$color_Text 9m 'Invalid option.')"
+	;;
+	esac
+done
+
+                read -p "$(color_Text 155m 'Which service would you like to manage?: ')" service
+                echo "$(color_Text 155m 'Would you like to') $(color_Text 9m 'stop'), $(color_Text 10m 'start') or $(color_Text 11m 'restart') the service?"
+
+
+                select Manage in "$(color_Text 9m 'Stop')" "$(color_Text 10m 'Start')" "$(color_Text 11m 'Restart')" "Back" "Exit"
+                do
+                        case $Manage in
+                        "$(color_Text 9m 'Stop')")
+                                echo "$(color_Text 9m 'Stopping service ${service}...')"
+                                sudo systemctl stop "$service"
+                                echo "$(color_Text 9m 'Service $service stopped.')"
+				sleep 1
+				clear
+				break
+                                ;;
+                        "$(color_Text 10m 'Start')")
+                                echo "$(color_Text 10m 'Starting service ${service}...')"
+                                sudo systemctl start "$service"
+                                echo "$(color_Text 10m 'Service $service started.')"
+				sleep 1
+				clear
+				break
+                                ;;
+                        "$(color_Text 11m 'Restart')")
+                                echo "$(color_Text 11m 'Restarting service ${service}...')"
+                                sudo systemctl restart "$service"
+                                echo "$(color_Text 11m 'Service $service restarted.')"
+				sleep 1
+				clear
+                                break
+                                ;;
+			"$(color_Text 14m 'Back')")
+				clear
+				servManMenu
+				break
+				;;
+			"Exit")
+				echo "You are exiting..."
+				exit 0
+				;;
+                        *)
+                                echo "$(color_Text 9m 'Invalid option.')"
+                                ;;
+                        esac
+                done
+}
+## ------------------------------------------------------------------------
+
+# Service Management Menu
+servManMenu(){
+Service_items=(
+                "$(color_Text 155m 'Show list of services')"
+                "$(color_Text 155m 'Stop or start a service')"
+                "$(color_Text 155m 'Exit')"
+                "$(color_Text 155m 'Back')"
+)
+printf "%150s %s\n" "$(color_Text 155m '---------------------------------')"
+printf "%145s %s\n" "$(color_Text 155m'Service Management')"
+printf "%150s %s\n" "$(color_Text 155m '---------------------------------')"
+
+        for i in "${!Service_items[@]}"; do
+                printf "%110s) %s\n" "$((i + 1))" "${Service_items[$i]}"
+        done
+        echo
+        read -p "Enter your choice: " choiceSer
+	case $choiceSer in
+		1) ListServices; echo; servManMenu  ;;
+		2) ManageServices; echo; servManMenu ;;
+		3) echo "You are exiting..."; exit 0 ;;
+		4) clear; mainMenu ;;
+		*) echo "Invalid Option"; sleep 1; clear; servManMenu ;;
+	esac
+}
+
+# ------------------------------------------------------------------------
+
+
+## Backups Menu
+BackUpMenu(){
+Backup_items=(
+                "$(color_Text 166m 'Recieve Date & Time for a backup')"
+                "$(color_Text 166m 'Make a backup now')"
+                "$(color_Text 166m 'Show Time & Date of last backup process')"
+               	"$(color_Text 166m 'Exit')"
+                "$(color_Text 166m 'Back')"
+)
+printf "%150s %s\n" "$(color_Text 166m '---------------------------------')"
+printf "%133s %s\n" "$(color_Text 166m 'Backup')"
+printf "%150s %s\n" "$(color_Text 166m '---------------------------------')"
+
+        for i in "${!Backup_items[@]}"; do
+                printf "%110s) %s\n" "$((i + 1))" "${Backup_items[$i]}"
+        done
+        echo
+        read -p "Enter your choice: " choiceBackUp
+        case $choiceBackUp in
+                1) backFol; echo; BackUpMenu  ;;
+		2) backFol_BackNow; echo; BackUpMenu ;;
+                3) ShoSta; echo; BackUpMenu ;;
+		4) echo "You are exiting..."; exit 0 ;;
+                5) clear; mainMenu ;;
+                *) echo "Invalid Option"; sleep 1; clear; BackUpMenu ;;
         esac
-    done
 }
 
 
-# << File Management Section >>
-
-# 1. Search for a File in the User's Home Directory
-search_file_in_home() {
-    echo -e "${CYAN}Enter the username to search for a file:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    echo -e "${CYAN}Enter the file name to search for:${RESET}"
-    read filename
-    if [ -z "$filename" ]; then
-        echo -e "${RED}File name cannot be empty.${RESET}"
-        return 1
-    fi
-
-    user_home=$(eval echo ~$username)
-    file_path=$(find "$user_home" -type f -name "$filename" 2>/dev/null)
-
-    if [ -z "$file_path" ]; then
-        echo -e "${RED}File $filename not found in $user_home.${RESET}"
-    else
-        echo -e "${GREEN}File found: $file_path${RESET}"
-    fi
-}
-
-# 2. Display the 10 Largest Files in the User's Home Directory
-display_largest_files() {
-    echo -e "${CYAN}Enter the username to display the largest files:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    user_home=$(eval echo ~$username)
-
-    echo -e "${CYAN}Displaying the 10 largest files in $user_home:${RESET}"
-    find "$user_home" -type f -exec du -h {} + | sort -rh | head -n 10 || echo -e "${RED}Failed to list largest files.${RESET}"
-}
-
-# 3. Display the 10 oldesr Files in the User's Home Directory
-display_oldest_files() {
-    echo -e "${CYAN}Enter the username to display the oldest files:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    user_home=$(eval echo ~$username)
-
-    echo -e "${CYAN}Displaying the 10 oldest files in $user_home:${RESET}"
-    find "$user_home" -type f -exec stat --format '%Y %n' {} + | sort -n | head -n 10 | cut -d' ' -f2- || echo -e "${RED}Failed to list oldest files.${RESET}"
-}
-
-# 4. Send a file as an Email Attachment
-send_file_email_attachment() {
-    echo -e "${CYAN}Enter the email address to send the file to:${RESET}"
-    read email
-    if [ -z "$email" ]; then
-        echo -e "${RED}Email address cannot be empty.${RESET}"
-        return 1
-    fi
-
-    echo -e "${CYAN}Enter the file name to attach:${RESET}"
-    read filename
-    if [ -z "$filename" ]; then
-        echo -e "${RED}File name cannot be empty.${RESET}"
-        return 1
-    fi
-
-    echo -e "${CYAN}Enter the username whose home directory the file is located in:${RESET}"
-    read username
-    if [ -z "$username" ]; then
-        echo -e "${RED}Username cannot be empty.${RESET}"
-        return 1
-    fi
-
-    if ! id "$username" &>/dev/null; then
-        echo -e "${RED}User $username does not exist.${RESET}"
-        return 1
-    fi
-
-    user_home=$(eval echo ~$username)
-    file_path=$(find "$user_home" -type f -name "$filename" 2>/dev/null)
-
-    if [ -z "$file_path" ]; then
-        echo -e "${RED}File $filename not found in $user_home.${RESET}"
-        return 1
-    fi
-
-    echo -e "${CYAN}Sending email with file $filename as an attachment to $email...${RESET}"
-    echo "Please find the attached file." | mail -s "File Attachment: $filename" -a "$file_path" "$email" && \
-    echo -e "${GREEN}Email sent successfully to $email.${RESET}" || \
-    echo -e "${RED}Failed to send email.${RESET}"
-}
-
-# File Management Menu Function
-fileManagementMenu() {
-    export COLUMNS=1
-    PS3="$(echo -e "${CYAN}Please select a file management option: ${RESET}")"
-
-    options=("Search for a file in user's home directory"
-             "Display the 10 largest files in user's home directory"
-             "Display the 10 oldest files in user's home directory"
-             "Send a file as an email attachment"
-             "Back to Main Menu"
-             "Exit")
-
-    select choice in "${options[@]}"; do
-        case $REPLY in
-        1) search_file_in_home ;;
-        2) display_largest_files ;;
-        3) display_oldest_files ;;
-        4) send_file_email_attachment ;;
-        5) echo -e "${CYAN}Returning to Main Menu...${RESET}" && break ;;
-        6) echo -e "${RED}Exiting...${RESET}" && exit 0 ;;
-        *) echo -e "${RED}Invalid Option, please try again.${RESET}" ;;
-        esac
-    done
-}
-
-## place to print stuff (start the script)
+## Place to print stuff
+clear
 mainMenu
