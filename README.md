@@ -1,90 +1,104 @@
-# UNIX Shell Script for Computer Management
-
-## Project Overview
-
-This project is a **UNIX Shell Script for Computer Management**, designed to help system administrators efficiently manage and monitor a Linux-based system (using Raspberry Pi and Ubuntu). The script provides several management tools, such as system status checks, backup scheduling, network configuration, user and file management, and more. The script is interactive, with a user-friendly menu allowing administrators to easily perform tasks and return to the main menu after each operation.
-
-## Project Requirements and Deliverables
-
-- **System status**: Monitor system health, including memory and CPU usage, active processes, and process management.
-- **Backup management**: Automate file backups based on user-specified schedules.
-- **Network management**: Display network information and manage network interfaces.
-- **Service management**: Control system services by starting or stopping them.
-- **User management**: Manage users, including adding, deleting, and modifying users' permissions and groups.
-- **File management**: Search for and manage files within users' home directories.
-- **Documentation**: A comprehensive document describing the project, requirements, components, and each team member’s contributions.
-
-## Task Assignment
-
-| **Team Member**  | **Responsibilities**                                                      |
-|------------------|---------------------------------------------------------------------------|
-| **Member 1**     | **System Status**: Check system memory, CPU temperature, active processes, and process management. |
-| **Member 2**     | **Backup & Network Management**: Schedule backups, display network info, manage network interfaces, and connect to Wi-Fi. |
-| **Member 3**     | **User & File Management**: Add/delete users, manage groups, search for files, and handle file operations (largest/oldest files, email attachments). |
-
-## Project Components and Solutions
-
-Each team member is responsible for implementing a specific section of the shell script:
-
-### **Member 1: System Status**
-- **Functionality**:
-    - Check memory status and display used/available memory.
-    - Check the CPU temperature and trigger an alarm if it exceeds 70°C.
-    - List active processes and allow the user to stop or close any process.
-- **Tools/Commands**:
-    - `free`, `top`, `ps`, `kill`, `sensors`
-    - Use conditionals to trigger warnings if CPU temperature is high.
-
-### **Member 2: Backup & Network Management**
-- **Backup Tasks**:
-    - Receive date, time, and file details to schedule backups.
-    - Display the last backup date/time.
-- **Network Tasks**:
-    - Show network card info and IP addresses.
-    - Disable/enable network interfaces and set IP addresses.
-    - List available Wi-Fi networks and allow user to connect.
-- **Tools/Commands**:
-    - `crontab`, `rsync`, `ifconfig`, `iwlist`, `nmcli`
-    - Use `cron` for scheduling backups.
-    - Network management commands for configuring network interfaces.
-
-### **Member 3: User & File Management**
-- **User Management Tasks**:
-    - Add a user with a specified username and password.
-    - Grant root permissions to a user.
-    - Delete a user and show connected users.
-    - Disconnect specific remote users.
-    - Modify user group membership.
-- **File Management Tasks**:
-    - Search for a file in the user's home directory and display its path.
-    - Display the 10 largest and 10 oldest files in the home directory.
-    - Email a file as an attachment to a specified email address.
-- **Tools/Commands**:
-    - `useradd`, `passwd`, `usermod`, `deluser`, `groups`, `find`, `du`, `tar`, `mail`
-    - Use `find` to search and list files.
-    - `du` and `ls` for identifying the largest/oldest files.
-    - Use `mail` to send email attachments.
-
-## Documentation
-Each member is responsible for documenting their specific section of the project:
-
-- **Member 1**: Document the system status checks, commands used, and how to interpret the results.
-- **Member 2**: Describe the backup scheduling functionality, network management, and associated commands.
-- **Member 3**: Provide detailed documentation for user and file management tasks, including file searching, file size/age listing, and emailing files.
-
-## GitHub Repository
-
-The entire script will be hosted in a GitHub repository at: [Unix_Project](https://github.com/laling08/Unix_Project.git)
-
-- Each member will commit their changes and contribute to the repository.
-- Regular updates and testing will be done to ensure all functionalities work as expected.
-
-## Project Evaluation
-
-The project will be evaluated based on:
-- **Functionality**: Ensuring that each task performs correctly.
-- **User-Friendliness**: The menu interface should be simple, clear, and intuitive for system administrators.
-- **Documentation**: Detailed explanations of each feature, including usage instructions and command references.
+# Unix: Final Term Project
+### By:  
+- Ishilia Gilcedes V. Labrador  
+- Jonathan Morin  
+- Nicholas Marijon  
 
 ---
 
+## Project Description
+This project is a UNIX Shell Script for Computer Management, designed to help system administrators efficiently manage and monitor a Linux-based system (using Raspberry Pi and Ubuntu). The script provides several management tools, such as system status checks, backup scheduling, network configuration, user and file management, and more. The script is interactive, with a user-friendly menu allowing administrators to easily perform tasks and return to the main menu after each operation.
+
+---
+
+## Member Contributions
+
+### Member 1: Nicholas
+#### My Role
+My role in this project consisted of coding the **System Status (Process Management)**, **Network Management**, and **Main Menu** of the project, which included about 13 functions in total. Functions make it easier to handle and manipulate code, especially for implementing a back button option and reprinting options for the user after each selection.
+
+#### Challenges
+1. Finding an alarm tune that felt appropriate for the project.
+2. Ensuring text colors were correctly set, as small errors could prevent colors from displaying.
+
+#### Menus Created
+- **Main Menu:** Displays the task divisions for user selection.  
+- **Process Management Menu:** Provides tasks related to system status, allowing users to select tasks repeatedly or return to the main menu.  
+- **Network Management Menu:** Lists tasks for network management with similar navigation options.  
+
+#### Functions Developed
+- **color_Text:** Changes text color using a 256-palette.  
+- **mem_Show:** Displays memory status in human-readable form.  
+- **check_Temp:** Monitors system temperature and triggers an alarm if it exceeds 70°C (specific to Raspberry Pi).  
+- **lis_Sys:** Lists all processes on the system.  
+- **clo_Pro:** Stops a process by PID.  
+- **lis_Card, ena_Card, dis_Card, recset_Card:** Manage network cards (list, enable, disable, assign IP).  
+- **check_Wifi:** Scans for nearby Wi-Fi networks and enables connections.  
+- **mainMenu, sys_Sta_Menu, netManMenu:** Display respective menus for user interaction.
+
+---
+
+### Member 2: Jonathan
+#### Service Management
+**Purpose:** Enables listing and managing system services (start, stop, restart).  
+
+**Functions Developed:**
+- **ListServices:** Lists all system services and provides menu options.  
+- **ListServices_NoClear:** Similar to `ListServices` but used with `ManageServices`.  
+- **ManageServices:** Allows users to start, stop, or restart a service.  
+- **servManMenu:** Main menu for service management tasks.
+
+**Challenges:**
+- Filtering unnecessary text for better readability.  
+- Aligning status fields regardless of service name length.
+
+#### Backup Management
+**Purpose:** Allows scheduling and immediate creation of file backups.  
+
+**Functions Developed:**
+- **BackUpMenu:** Displays the backup menu.  
+- **ShoSta:** Shows the latest backup details.  
+- **backFol:** Prompts the user to select a file to back up.  
+- **BackupDate:** Schedules backups based on user-inputted date and time.  
+- **validateAndMake:** Validates date input and creates backup scripts.  
+- **BackupNow:** Creates an immediate backup.  
+
+**Challenges:**
+- Validating leap years and dates.  
+- Ensuring multiple cron jobs run concurrently without conflicts.  
+- Resolving file permission issues for backup scripts.
+
+---
+
+### Member 3: Ishilia
+#### File Management
+**Purpose:** Implements file management functionalities for user directories. Tasks include searching files, displaying largest/oldest files, and sending files via email.  
+
+**Functions Developed:**
+- **Search for a file:** Searches for a specific file in a user’s home directory.  
+- **Display the largest files:** Lists the 10 largest files in the directory.  
+- **Display the oldest files:** Lists the 10 oldest files in the directory.  
+- **Send file as an email attachment:** Sends a file to a specified email address.
+
+**Challenges:**
+- Handling edge cases for invalid input or nonexistent files.  
+- Formatting output for readability.  
+- Configuring email functionality and ensuring dependencies are installed.
+
+---
+
+### User Management
+**Description:**  
+Provides tools for validating user existence and managing files based on the user’s home directory.  
+
+**Purpose:**
+- Ensures valid user access to home directories.  
+- Facilitates secure file management with user-friendly navigation.
+
+**Challenges:**
+- Validating usernames securely and handling errors gracefully.  
+- Managing file permissions to prevent unauthorized actions.  
+
+---
+
+**Note:** This project integrates multiple functionalities into a cohesive script for enhanced system management. Each section is designed for efficiency, reliability, and user-friendliness.
